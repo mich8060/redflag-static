@@ -7,32 +7,45 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
 <?php wp_head(); ?>
 </head>
-
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+
+<section class="toolbar">
+    <div class="toolbar--container">
+        <div>
+            Call or Text Us:
+            <a href="tel:469-436-5274" class="system-content-link-alt">469-436-5274</a>
+        </div>
+        <div>
+            <a href="#" class="system-content-link-alt">Support</a> |
+            <a href="#" class="system-content-link-alt">Login</a>
+        </div>
+    </div>
+</section>
+
 <header class="header">
-    <div class="container">
-        <h1 class="site-title">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>">
-                <?php bloginfo( 'name' ); ?>
-            </a>
-        </h1>
-        <p class="site-description"><?php bloginfo( 'description' ); ?></p>
-        <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
-            ☰ Menu
-        </button>
-        <nav class="site-nav">
-            <?php
-                wp_nav_menu( array(
-                    'theme_location' => 'primary',
-                    'container'      => false,
-                    'menu_class'     => 'nav-menu',
-                    'fallback_cb'    => false
-                ));
-            ?>
-        </nav>
+    <div class="header--container">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="header--branding">
+            <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/redflag.svg" alt="GetApp" />
+        </a>
+        <button class="nav--toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+		<nav class="nav">
+			<?php
+			wp_nav_menu( array(
+				'theme_location' => 'primary',
+				'container'      => false,
+				'menu_class'     => 'nav--container',
+				'walker'         => new Redflag_Walker_Nav_Menu()
+			) );
+			?>
+		</nav>
+        <a href="#" class="button">Book Demo</a>
     </div>
 </header>

@@ -1,53 +1,117 @@
 <?php
-
-// Basic theme setup and menu registration
+/**
+ * Theme Setup
+ */
 function mytheme_setup() {
     add_theme_support( 'title-tag' );
     add_theme_support( 'post-thumbnails' );
     add_theme_support( 'elementor' );
 
-    // Register primary navigation menu
     register_nav_menus( array(
         'primary' => __( 'Primary Menu', 'mytheme' ),
+        'footer'  => __( 'Footer Menu', 'mytheme' ),
     ) );
 }
 add_action( 'after_setup_theme', 'mytheme_setup' );
 
-// Load the main stylesheet
-function mytheme_enqueue_styles() {
-    wp_enqueue_style( 'mytheme-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );
+
+/**
+ * Enqueue Theme Styles and Scripts
+ */
+function mytheme_enqueue_assets() {
+    wp_enqueue_style( 'mytheme-style', get_stylesheet_uri(), [], wp_get_theme()->get( 'Version' ) );
+
+    wp_enqueue_script(
+        'menu-toggle',
+        get_template_directory_uri() . '/menu-toggle.js',
+        [],
+        filemtime( get_template_directory() . '/menu-toggle.js' ),
+        true
+    );
 }
-add_action( 'wp_enqueue_scripts', 'mytheme_enqueue_styles' );
+add_action( 'wp_enqueue_scripts', 'mytheme_enqueue_assets' );
 
 
-// Assign specific icons to the main navigation
-function mytheme_add_menu_icons( $item_output, $item, $depth, $args ) {
-    if ( in_array( 'icon-chats', $item->classes ) ) {
-        $icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 9V21L17.2894 18H8.25C8.05109 18 7.86032 17.921 7.71967 17.7803C7.57902 17.6397 7.5 17.4489 7.5 17.25V13.5H15.75C15.9489 13.5 16.1397 13.421 16.2803 13.2803C16.421 13.1397 16.5 12.9489 16.5 12.75V8.25H20.25C20.4489 8.25 20.6397 8.32902 20.7803 8.46967C20.921 8.61032 21 8.80109 21 9Z" fill="#B7CBE0"/>
-            <path d="M20.25 7.5H17.25V4.5C17.25 4.10218 17.092 3.72064 16.8107 3.43934C16.5294 3.15804 16.1478 3 15.75 3H3.75C3.35218 3 2.97064 3.15804 2.68934 3.43934C2.40804 3.72064 2.25 4.10218 2.25 4.5V16.5C2.25044 16.6411 2.29068 16.7792 2.36608 16.8985C2.44149 17.0177 2.54901 17.1133 2.67629 17.1742C2.80358 17.2351 2.94546 17.2589 3.08564 17.2428C3.22581 17.2266 3.3586 17.1713 3.46875 17.0831L6.75 14.4375V17.25C6.75 17.6478 6.90804 18.0294 7.18934 18.3107C7.47064 18.592 7.85218 18.75 8.25 18.75H17.0241L20.5312 21.5831C20.664 21.6905 20.8293 21.7493 21 21.75C21.1989 21.75 21.3897 21.671 21.5303 21.5303C21.671 21.3897 21.75 21.1989 21.75 21V9C21.75 8.60218 21.592 8.22064 21.3107 7.93934C21.0294 7.65804 20.6478 7.5 20.25 7.5ZM6.23906 12.9169L3.75 14.9297V4.5H15.75V12.75H6.71063C6.53897 12.75 6.37252 12.8089 6.23906 12.9169ZM20.25 19.4297L17.7609 17.4169C17.6282 17.3095 17.4629 17.2507 17.2922 17.25H8.25V14.25H15.75C16.1478 14.25 16.5294 14.092 16.8107 13.8107C17.092 13.5294 17.25 13.1478 17.25 12.75V9H20.25V19.4297Z" fill="#111111"/>
-        </svg>';
-        $item_output = str_replace( $item->title, $icon . ' ' . $item->title, $item_output );
-    }
-
-    if ( in_array( 'icon-usersound', $item->classes ) ) {
-        $icon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.75 10.125C15.75 11.2375 15.4201 12.3251 14.802 13.2501C14.1839 14.1751 13.3054 14.8961 12.2776 15.3218C11.2498 15.7476 10.1188 15.859 9.02762 15.6419C7.93648 15.4249 6.9342 14.8891 6.14753 14.1025C5.36086 13.3158 4.82513 12.3135 4.60809 11.2224C4.39104 10.1312 4.50244 9.00024 4.92818 7.97241C5.35392 6.94457 6.07489 6.06607 6.99992 5.44798C7.92495 4.8299 9.01248 4.5 10.125 4.5C11.6168 4.5 13.0476 5.09263 14.1025 6.14752C15.1574 7.20242 15.75 8.63316 15.75 10.125Z" fill="#B7CBE0"/>
-            <path d="M13.5029 15.5323C14.6786 14.8001 15.5838 13.7048 16.0816 12.4122C16.5794 11.1197 16.6427 9.70013 16.2619 8.36839C15.8811 7.03666 15.0769 5.86518 13.971 5.0312C12.8651 4.19721 11.5177 3.74609 10.1326 3.74609C8.74746 3.74609 7.40003 4.19721 6.29413 5.0312C5.18824 5.86518 4.38405 7.03666 4.00324 8.36839C3.62243 9.70013 3.68571 11.1197 4.18351 12.4122C4.68131 13.7048 5.58654 14.8001 6.76226 15.5323C4.82632 16.1661 3.08444 17.3502 1.68382 19.017C1.55577 19.1693 1.49346 19.3662 1.5106 19.5645C1.52775 19.7627 1.62293 19.946 1.77523 20.0741C1.92752 20.2021 2.12444 20.2644 2.32267 20.2473C2.5209 20.2301 2.70421 20.1349 2.83226 19.9827C4.71382 17.7364 7.30694 16.4998 10.1279 16.4998C12.9488 16.4998 15.5419 17.7364 17.4291 19.9827C17.5572 20.1349 17.7405 20.2301 17.9387 20.2473C18.1369 20.2644 18.3339 20.2021 18.4862 20.0741C18.6385 19.946 18.7336 19.7627 18.7508 19.5645C18.7679 19.3662 18.7056 19.1693 18.5776 19.017C17.176 17.3502 15.4341 16.1661 13.5029 15.5323ZM5.25288 10.1248C5.25288 9.16066 5.5388 8.21813 6.07447 7.41644C6.61014 6.61475 7.37151 5.98991 8.2623 5.62093C9.15309 5.25195 10.1333 5.15541 11.0789 5.34351C12.0246 5.53162 12.8932 5.99592 13.575 6.6777C14.2568 7.35948 14.7211 8.22812 14.9092 9.17378C15.0973 10.1194 15.0008 11.0996 14.6318 11.9904C14.2628 12.8812 13.638 13.6426 12.8363 14.1783C12.0346 14.7139 11.0921 14.9998 10.1279 14.9998C8.83541 14.9984 7.5963 14.4843 6.68238 13.5703C5.76846 12.6564 5.25437 11.4173 5.25288 10.1248ZM19.4429 6.14984C19.9774 7.40691 20.2529 8.75886 20.2529 10.1248C20.2529 11.4908 19.9774 12.8428 19.4429 14.0998C19.3852 14.2351 19.289 14.3503 19.1663 14.4313C19.0437 14.5123 18.8999 14.5555 18.7529 14.5555C18.6287 14.5556 18.5065 14.5248 18.3972 14.4661C18.2878 14.4073 18.1948 14.3223 18.1264 14.2186C18.058 14.115 18.0164 13.9961 18.0053 13.8724C17.9942 13.7487 18.014 13.6243 18.0629 13.5102C18.5182 12.4396 18.7529 11.2882 18.7529 10.1248C18.7529 8.96148 18.5182 7.81008 18.0629 6.73953C17.9847 6.55653 17.9824 6.34996 18.0565 6.16527C18.1306 5.98058 18.275 5.83288 18.458 5.75469C18.641 5.67649 18.8476 5.67419 19.0323 5.7483C19.217 5.8224 19.3647 5.96684 19.4429 6.14984ZM23.2529 10.1248C23.2564 11.9024 22.8962 13.6619 22.1944 15.2952C22.1124 15.4722 21.9645 15.6102 21.7823 15.68C21.6002 15.7498 21.3979 15.7459 21.2186 15.669C21.0393 15.5921 20.897 15.4484 20.8218 15.2684C20.7467 15.0883 20.7448 14.886 20.8163 14.7045C21.4343 13.2568 21.7529 11.699 21.7529 10.1248C21.7529 8.55073 21.4343 6.99289 20.8163 5.54516C20.7741 5.45413 20.7506 5.35555 20.7472 5.25527C20.7437 5.15498 20.7605 5.05503 20.7964 4.96133C20.8323 4.86763 20.8866 4.78208 20.9561 4.70976C21.0257 4.63743 21.1091 4.5798 21.2013 4.54028C21.2935 4.50075 21.3927 4.48013 21.4931 4.47964C21.5934 4.47916 21.6928 4.49881 21.7854 4.53744C21.878 4.57606 21.962 4.63288 22.0322 4.70453C22.1025 4.77617 22.1576 4.86118 22.1944 4.95453C22.8962 6.58774 23.2564 8.34725 23.2529 10.1248Z" fill="#111111"/>
-        </svg>';
-        $item_output = str_replace( $item->title, $icon . ' ' . $item->title, $item_output );
-    }
-
-    return $item_output;
-}
-add_filter( 'walker_nav_menu_start_el', 'mytheme_add_menu_icons', 10, 4 );
-
-
-
-function mytheme_enqueue_scripts() {
-  wp_enqueue_style( 'mytheme-style', get_stylesheet_uri(), [], wp_get_theme()->get( 'Version' ) );
-  wp_enqueue_script( 'menu-toggle', get_template_directory_uri() . '/menu-toggle.js', [], false, true );
-}
-add_action( 'wp_enqueue_scripts', 'mytheme_enqueue_scripts' );
-
+/**
+ * Hide Admin Bar on Frontend
+ */
 add_filter( 'show_admin_bar', '__return_false' );
+
+
+
+/**
+ * Count and annotate how many children each menu item has
+ */
+function redflag_add_child_count_to_items($items, $args) {
+    $counts = [];
+
+    foreach ($items as $item) {
+        if ($item->menu_item_parent) {
+            $counts[$item->menu_item_parent] = ($counts[$item->menu_item_parent] ?? 0) + 1;
+        }
+    }
+
+    foreach ($items as &$item) {
+        $item->child_count = $counts[$item->ID] ?? 0;
+    }
+
+    return $items;
+}
+add_filter('wp_nav_menu_objects', 'redflag_add_child_count_to_items', 10, 2);
+
+
+/**
+ * Custom Walker to generate nav structure
+ */
+class Redflag_Walker_Nav_Menu extends Walker_Nav_Menu {
+    function start_lvl( &$output, $depth = 0, $args = array() ) {
+        $indent = str_repeat("\t", $depth);
+        $submenu_class = $depth === 0 ? 'nav--submenu' : 'nav--column';
+        $output .= "\n$indent<ul class=\"$submenu_class\">\n";
+    }
+
+    function end_lvl( &$output, $depth = 0, $args = array() ) {
+        $output .= str_repeat("\t", $depth) . "</ul>\n";
+    }
+
+    function start_el( &$output, $item, $depth = 0, $args = [], $id = 0 ) {
+        $indent = str_repeat("\t", $depth);
+        $classes = [];
+
+        if ($depth === 0) {
+            $classes[] = 'nav--item';
+            if (!empty($item->child_count)) {
+                $classes[] = 'nav--column_' . $item->child_count;
+            }
+        } elseif ($depth === 1) {
+            $classes[] = 'nav--group';
+        } elseif ($depth === 2) {
+            $classes[] = 'nav--child';
+        }
+
+        $class_names = implode(' ', $classes);
+        $output .= "$indent<li class=\"$class_names\">";
+
+        $attrs = ' href="' . esc_attr($item->url) . '"';
+        if (in_array('current-menu-item', $item->classes)) {
+            $attrs .= ' aria-current="page"';
+        }
+
+        $title = apply_filters('the_title', $item->title, $item->ID);
+
+        $icon_svg = '';
+
+        if(!empty($item->classes[0])) {
+            $icon_svg = '<i class="ph-duotone ph-' . esc_attr($item->classes[0]) . ' lg"></i>';
+            $has_icon = true;
+        }
+
+
+        $caret_svg = (!empty($item->child_count) && $depth === 0) ? '<i class="ph-bold ph-caret-down sm"></i>' : '';
+        $output .= "<a$attrs>$icon_svg$title $caret_svg</a>";
+    }
+
+    function end_el( &$output, $item, $depth = 0, $args = [], $id = 0 ) {
+        $output .= "</li>\n";
+    }
+}
